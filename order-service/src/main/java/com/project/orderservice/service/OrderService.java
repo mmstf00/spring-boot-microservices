@@ -40,7 +40,7 @@ public class OrderService {
                 .map(OrderLineItems::getSkuCode)
                 .toList();
 
-        if (Boolean.TRUE.equals(isInStock(skuCodes))) {
+        if (isInStock(skuCodes)) {
             orderRepository.save(order);
         } else {
             throw new ProductNotInStockException("Product is not in stock, try again later");
