@@ -4,6 +4,11 @@
 # Service Architecture
 ![Service architecture](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/32c1cc98-d9b4-4f1c-962f-c30bb5d1094b)
 
-# Internal Service Communitaction
+# Internal Service Communication
 ![Internal service communication](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/1c4aacee-d0d9-4e8a-8004-f1b5a767bfd4)
 
+# Service Discovery Pattern
+![Screenshot_2](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/1a256490-68eb-4e38-b01e-bf8593179303)
+
+# Communication with service discovery
+![Screenshot_3](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/c2c2f01d-ec7c-437c-ab4c-2f4640cad8c8)
