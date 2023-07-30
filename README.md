@@ -12,3 +12,8 @@
 
 # Communication with service discovery
 ![Screenshot_3](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/c2c2f01d-ec7c-437c-ab4c-2f4640cad8c8)
+
+# Api Gateway
+The API Gateway will be called with HTTP over TLS (HTTPS) protocol, and intenal communication will be done using HTTP
+![Screenshot_1](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/5538c18f-1f92-4aeb-8f7a-83a084f3068f)
+
