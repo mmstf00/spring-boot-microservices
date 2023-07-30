@@ -17,5 +17,13 @@ spring:
           sharedCache:
             mode: UNSPECIFIED
     open-in-view: off
+  application:
+    name: inventory-service
 server:
-  port: 8082
+  port: 0 #It will run the application with random port
+
+# Eureka client config
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
