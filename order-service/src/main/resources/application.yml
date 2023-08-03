@@ -60,7 +60,8 @@ resilience4j:
   # Resilience4J Timeout Properties
   timelimiter:
     instances:
-      timeout-duration: 3s
+      inventory:
+        timeout-duration: 3s
 
   # Resilience4J Retry Properties
   retry:
