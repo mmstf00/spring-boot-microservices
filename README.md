@@ -17,3 +17,8 @@
 The API Gateway will be called with HTTP over TLS (HTTPS) protocol, and intenal communication will be done using HTTP
 ![Screenshot_1](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/5538c18f-1f92-4aeb-8f7a-83a084f3068f)
 
+Start Keycloak using docker command
+<br>
+```
+docker run -p 8181:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.1 start-dev
+```
