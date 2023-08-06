@@ -1,5 +1,23 @@
 version: '3'
 services:
+
+  # Keycloak
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    ports:
+      - "8181:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command: [ "start-dev" ]
+
+  ## Discovery Server logs Warnings if Zipkin is not started
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
     container_name: zookeeper

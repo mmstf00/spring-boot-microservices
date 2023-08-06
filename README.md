@@ -1,30 +1,39 @@
-# Application Architecture
-![Application architecture ](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/2aebd67f-c35b-49f7-992a-4f0b83a71c0a)
+### Start the Keycloak, Zipkin, Zookeeper and the Broker using docker 🐋
 
-# Service Architecture
-![Service architecture](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/32c1cc98-d9b4-4f1c-962f-c30bb5d1094b)
-
-# Internal Service Communication
-![Internal service communication](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/1c4aacee-d0d9-4e8a-8004-f1b5a767bfd4)
-
-# Service Discovery Pattern
-![Screenshot_2](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/1a256490-68eb-4e38-b01e-bf8593179303)
-
-# Communication with service discovery
-![Screenshot_3](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/c2c2f01d-ec7c-437c-ab4c-2f4640cad8c8)
-
-# Api Gateway
-The API Gateway will be called with HTTP over TLS (HTTPS) protocol, and intenal communication will be done using HTTP
-![Screenshot_1](https://github.com/mmstf00/spring-boot-microservices/assets/65444856/5538c18f-1f92-4aeb-8f7a-83a084f3068f)
-
-Start Keycloak with Docker
-<br>
 ```
-docker run -p 8181:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.1 start-dev
+docker compose up -d
 ```
 
-Start Zipkin with Docker
-<br>
-```
-docker run -d -p 9411:9411 openzipkin/zipkin
-```
+### Start all the services manually
+
+### Keycloak setup
+
+1. Open `localhost:8181`
+    - username: `admin`
+    - password: `admin`
+2. Create a new Realm
+3. Create client secret
+    - Client ID: `spring-cloud-client`
+    - Client authentication: `on`
+    - Authentication flow: `off`
+    - Direct access grants: `off`
+    - Service accounts roles: `on`
+    - Click `Save`, this will create a client secret
+4. Get the Client Secret from `Clients` -> `Credentials` tab
+5. Go to `Realm Settings`
+    - Click `OpenID Endpoint Configuration`
+    - Copy `issuer` value: `http://localhost:8181/realms/master`
+
+### Execute HTTP requests with Postman
+
+1. Add the OAuth config
+    - Open `Authorization`
+    - Select Type `OAuth 2.0`
+    - Configure New Token
+        - Token Name: `token`
+        - Grant Type: `Client Credentials`
+        - Access Token URL: The `token_endpoint` value from OpenId Configuration
+        - Client ID: `spring-cloud-client`
+        - Client Secret: Get from 3rd of Keycloak setup.
+        - Click `Get New Access Token` and `Use Token`
+        - Send the Request
