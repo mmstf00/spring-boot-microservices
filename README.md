@@ -1,4 +1,4 @@
-### Start the PostgresSQL, PgAdmin, Keycloak, Zipkin, Zookeeper and the Broker using docker 🐋
+### Start PostgresSQL, Keycloak, Zipkin and Zookeeper using docker 🐋
 
 ```
 docker compose up -d
