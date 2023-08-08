@@ -1,10 +1,21 @@
-### Start the Keycloak, Zipkin, Zookeeper and the Broker using docker 🐋
+### Start the PostgresSQL, PgAdmin, Keycloak, Zipkin, Zookeeper and the Broker using docker 🐋
 
 ```
 docker compose up -d
 ```
 
-### Start all the services manually
+### Connect to PostgreSQL via IntelliJ
+
+1. Properties
+    - `Host`: **localhost**
+    - `Port`: **5431**
+    - `Password`: **1234**
+2. When using PostgreSQL the databases has to be created manually at the start:
+    - `inventory-service`
+    - `order-service`
+    - `product-service`
+
+### Start all the services manually with `docker` profile
 
 ### Keycloak setup
 
@@ -37,3 +48,15 @@ docker compose up -d
         - Client Secret: Get from 3rd of Keycloak setup.
         - Click `Get New Access Token` and `Use Token`
         - Send the Request
+
+## Available endpoints
+
+|     Name      |        Address        |
+|:-------------:|:---------------------:|
+| Eureka Server | http://localhost:8761 |
+|   Keycloak    | http://localhost:8181 |
+|    Zipkin     | http://localhost:9411 |
+
+## Notes
+- It takes around 30 seconds for eureka server to register the services after starting
+- After restarting a service, new token should be created

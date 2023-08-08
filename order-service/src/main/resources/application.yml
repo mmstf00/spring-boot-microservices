@@ -33,7 +33,7 @@ spring:
               mapping: event:com.project.orderservice.event.OrderPlacedEvent
 
 server:
-  port: 8081
+  port: 0
 
 # Eureka client config
 eureka:

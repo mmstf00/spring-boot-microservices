@@ -1,6 +1,7 @@
 package com.project.productservice.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 @Data
 public class Product {
     @Id
+    @GeneratedValue
     private Long id;
     private String name;
     private String description;

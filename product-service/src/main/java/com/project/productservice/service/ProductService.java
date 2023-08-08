@@ -24,7 +24,8 @@ public class ProductService {
                 .price(productRequest.getPrice())
                 .build();
 
-        productRepository.save(product);
+        // Using saveAndFlush to be able to access the generated id.
+        productRepository.saveAndFlush(product);
         log.info("Product {} is saved", product.getId());
     }
 

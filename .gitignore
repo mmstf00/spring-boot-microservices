@@ -32,14 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-### My SQL Host Data ###
-/mysql_keycloak_data/
-my-sql-data
-mongo-data
-/postgres/
-/postgres-inventory/
-/postgres-order/
-/postgres-product/
-
 ### Grafana ###
 /grafana/
