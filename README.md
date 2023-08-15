@@ -31,8 +31,8 @@ docker compose up -d
 
 ### Additional Local setup to execute requests via Api Gateway
 
-- Add `    127.0.0.1		keycloak` in `C:\Windows\System32\drivers\etc\hosts.file` under this
-  line `#    ::1` to contact docker container from the host machine
+- Add `127.0.0.1   keycloak` in `C:\Windows\System32\drivers\etc\hosts.file` under this
+  line `# ::1` to contact docker container from the host machine
 
 ### Execute HTTP requests with Postman
 
