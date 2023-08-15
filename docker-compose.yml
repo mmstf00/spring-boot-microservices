@@ -1,57 +1,99 @@
-version: '3.8'
+---
+version: '3.7'
 services:
 
-  # PostgreSQL database
-  postgres:
+  ## Database for Order Service
+  postgres-order:
+    container_name: postgres-order
     image: postgres
-    container_name: postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-1234}
-      POSTGRES_DB: postgres
+      POSTGRES_DB: order-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
       PGDATA: /data/postgres
     volumes:
-      - postgres:/data/postgres
+      - ./postgres-order:/data/postgres
+    expose:
+      - "5431"
     ports:
-      - "5431:5432"
-    networks:
-      - postgres
+      - "5431:5431"
+    command: -p 5431
+    restart: always
 
-  #  # PG Admin Setup for Non-Ultimate IntelliJ
-  #  pgadmin:
-  #    image: dpage/pgadmin4
-  #    container_name: pgadmin
-  #    environment:
-  #      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-  #      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-  #      PGADMIN_CONFIG_SERVER_MODE: 'False'
-  #    volumes:
-  #      - pgadmin:/var/lib/pgadmin
-  #    ports:
-  #      - "${PGADMIN_PORT:-5050}:80"
-  #    networks:
-  #      - postgres
-
-  # Keycloak
-  keycloak:
-    image: quay.io/keycloak/keycloak:22.0.1
-    ports:
-      - "8181:8080"
+  ## Database for Product Service
+  postgres-product:
+    container_name: postgres-product
+    image: postgres
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-    command: [ "start-dev" ]
-
-  ## Discovery Server logs Warnings if Zipkin is not started
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin
+      POSTGRES_DB: product-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-product:/data/postgres
+    expose:
+      - "5433"
     ports:
-      - "9411:9411"
+      - "5433:5433"
+    command: -p 5433
+    restart: always
+
+  ## Database for Inventory Service
+  postgres-inventory:
+    container_name: postgres-inventory
+    image: postgres
+    environment:
+      POSTGRES_DB: inventory-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-inventory:/data/postgres
+    expose:
+      - "5434"
+    ports:
+      - "5434:5434"
+    command: -p 5434
+    restart: always
+
+  ## Keycloak Config with Mysql database
+  keycloak-mysql:
+    container_name: keycloak-mysql
+    image: mysql:5.7
+    volumes:
+      - ./mysql_keycloak_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+
+  ## Keycloak Config
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:18.0.0
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_HOSTNAME: keycloak #By specifying this, http://keycloak:port can be accessed instead of localhost
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./realms/:/opt/keycloak/data/import/
+    depends_on:
+      - keycloak-mysql
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
     container_name: zookeeper
+    ports:
+      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -72,10 +114,116 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-networks:
-  postgres:
-    driver: bridge
+  ## Discovery Server logs Warnings if Zipkin is not started
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
 
-volumes:
-  postgres:
-  pgadmin:
+  ## Eureka Server Docker Compose Config
+  discovery-server:
+    image: registry.hub.docker.com/mustafa1592/discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - zipkin
+
+  ## Api Gateway Docker Compose Config
+  api-gateway:
+    image: registry.hub.docker.com/mustafa1592/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8585:8080"
+    expose:
+      - "8585"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+    depends_on:
+      - zipkin
+      - discovery-server
+      - keycloak
+
+  ## Inventory Service Docker Compose Config
+  inventory-service:
+    container_name: inventory-service
+    image: registry.hub.docker.com/mustafa1592/inventory-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-inventory:5434/inventory-service
+    depends_on:
+      - postgres-inventory
+      - discovery-server
+      - api-gateway
+
+  ## Notification Service Docker Compose Config
+  notification-service:
+    container_name: notification-service
+    image: registry.hub.docker.com/mustafa1592/notification-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - zipkin
+      - broker
+      - discovery-server
+      - api-gateway
+
+  ## Order-Service Docker Compose Config
+  order-service:
+    container_name: order-service
+    image: registry.hub.docker.com/mustafa1592/order-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-order:5431/order-service
+    depends_on:
+      - postgres-order
+      - broker
+      - zipkin
+      - discovery-server
+      - api-gateway
+
+  ## Product Service Docker Compose Config
+  product-service:
+    container_name: product-service
+    image: registry.hub.docker.com/mustafa1592/product-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-product:5433/product-service
+    depends_on:
+      - postgres-product
+      - discovery-server
+      - api-gateway
+
+  ## Prometheus
+  prometheus:
+    image: prom/prometheus:v2.37.1
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - product-service
+      - inventory-service
+      - order-service
+      - notification-service
+
+  ## Grafana
+  grafana:
+    image: grafana/grafana-oss:8.5.2
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password

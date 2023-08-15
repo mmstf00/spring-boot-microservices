@@ -1,56 +1,48 @@
 spring:
+  application:
+    name: order-service
+  banner:
+    location: classpath:banner.txt
   datasource:
-    url: jdbc:postgresql://localhost:5432/order-service
-    username: postgres
-    password: 1234
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
+    url: jdbc:postgresql://localhost:5431/order-service
+    driver-class-name: org.postgresql.Driver
+    password: postgres
+    username: 1234
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-      jakarta:
-        persistence:
-          sharedCache:
-            mode: UNSPECIFIED
-    open-in-view: off
-  application:
-    name: order-service
   kafka:
-    bootstrap-servers: localhost:9092
-    template:
-      default-topic: notificationTopic
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring:
           json:
             type:
               mapping: event:com.project.orderservice.event.OrderPlacedEvent
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    template:
+      default-topic: notificationTopic
+    bootstrap-servers: localhost:9092
 
 server:
-  port: 0
+  port: 8081
 
 # Eureka client config
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka:password@localhost:8761/eureka
 
-# Enable Actuator
+# Actuator Properties
 management:
-  health:
-    circuitbreakers:
-      enabled: true
   endpoints:
     web:
       exposure:
         # The actuator will expose all kind of endpoints
-        include: "*"
+        include: '*'
+  health:
+    circuitbreakers:
+      enabled: true
   endpoint:
     health:
       show-details: always
@@ -86,9 +78,9 @@ resilience4j:
   retry:
     instances:
       inventory:
-        max-attempts: 3
         wait-duration: 5s
+        max-attempts: 3
 
 logging:
   pattern:
-    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'

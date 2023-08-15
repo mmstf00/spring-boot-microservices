@@ -1,34 +1,30 @@
 spring:
+  application:
+    name: product-service
+  banner:
+    location: classpath:banner.txt
   datasource:
-    url: jdbc:postgresql://localhost:5432/product-service
+    url: jdbc:postgresql://localhost:5433/product-service
+    driver-class-name: org.postgresql.Driver
     username: postgres
     password: 1234
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-      jakarta:
-        persistence:
-          sharedCache:
-            mode: UNSPECIFIED
-    open-in-view: off
-  application:
-    name: product-service
+
 server:
   port: 0
 
-# Eureka client config
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka:password@localhost:8761/eureka
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans

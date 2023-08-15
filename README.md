@@ -1,39 +1,39 @@
-### Start PostgresSQL, Keycloak, Zipkin and Zookeeper using docker 🐋
+### Build and Deploy the Application
+
+```
+1. Run "mvn clean install"
+2. Run "jib:build" plugin"
+```
+
+### Start applications using docker 🐋
 
 ```
 docker compose up -d
 ```
 
-### Connect to PostgreSQL via IntelliJ
+### Connect to PostgreSQL databases via IntelliJ
 
 1. Properties
     - `Host`: **localhost**
-    - `Port`: **5431**
+    - `Port`: **5431** and **5432**
     - `Password`: **1234**
-2. When using PostgreSQL the databases has to be created manually at the start:
-    - `inventory-service`
-    - `order-service`
-    - `product-service`
-
-### Start all the services manually with `docker` profile
 
 ### Keycloak setup
 
 1. Open `localhost:8181`
     - username: `admin`
     - password: `admin`
-2. Create a new Realm
-3. Create client secret
-    - Client ID: `spring-cloud-client`
-    - Client authentication: `on`
-    - Authentication flow: `off`
-    - Direct access grants: `off`
-    - Service accounts roles: `on`
-    - Click `Save`, this will create a client secret
-4. Get the Client Secret from `Clients` -> `Credentials` tab
-5. Go to `Realm Settings`
+
+2. Generate secret
+    - Open `Clients` tab from left side
+    - Open `spring-cloud-client`
+    - Go to `Credentials` tab and click Regenerate Secret
+
+3. Open `Realm Settings`
     - Click `OpenID Endpoint Configuration`
-    - Copy `issuer` value: `http://localhost:8181/realms/master`
+    - Copy `issuer` value: `http://localhost:8080/realms/spring-boot-microservices-realm`
+    - Change in the URL `localhost` to `keycloak`, so API gateway do not try to call localhost for issuer URI.
+    - Add `	127.0.0.1		keycloak` in `C:\Windows\System32\drivers\etc\hosts.file` under this line `#	::1` to contact docker container from the host machine
 
 ### Execute HTTP requests with Postman
 
@@ -53,10 +53,12 @@ docker compose up -d
 
 |     Name      |        Address        |
 |:-------------:|:---------------------:|
+| API Endpoint  | http://localhost:8181 |
 | Eureka Server | http://localhost:8761 |
-|   Keycloak    | http://localhost:8181 |
+|   Keycloak    | http://localhost:8080 |
 |    Zipkin     | http://localhost:9411 |
 
 ## Notes
+
 - It takes around 30 seconds for eureka server to register the services after starting
 - After restarting a service, new token should be created

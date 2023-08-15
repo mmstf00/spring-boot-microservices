@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: product-service
+  name: product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  strategy: { }
+  template:
+    metadata:
+
+      labels:
+        app: product-service
+    spec:
+      containers:
+        - env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-product:5433/product-service
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+          image: mustafa1592/product-service:latest
+          name: product-service
+          resources: { }
+      restartPolicy: Always
+status: { }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: product-service
+  name: product-service
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 9193
+  selector:
+    app: product-service
+status:
+  loadBalancer: { }

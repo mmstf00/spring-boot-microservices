@@ -1,6 +1,8 @@
 spring:
   application:
     name: notification-service
+  banner:
+    location: classpath:banner.txt
   kafka:
     bootstrap-servers: localhost:9092
     template:
@@ -15,6 +17,7 @@ spring:
             type:
               # The "event" is random token, but should be the same at Producer and Consumer side
               mapping: event:com.project.notificationservice.event.OrderPlacedEvent
+
 server:
   port: 0
 
@@ -22,13 +25,22 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka:password@localhost:8761/eureka
 
-# Enable Actuator
+# Actuator Properties
 management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
   zipkin:
     tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+      endpoint: http://localhost:9411/api/v2/spans/
   tracing:
     sampling:
-      probability: 1.0
+      probability: '1'
+
+logging:
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+

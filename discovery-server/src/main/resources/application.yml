@@ -1,10 +1,15 @@
 spring:
   application:
     name: discovery-server
+  banner:
+    location: classpath:banner.txt
   security:
     user:
-      name: eureka
       password: password
+      name: eureka
+
+server:
+  port: 8761
 
 eureka:
   instance:
@@ -14,10 +19,12 @@ eureka:
     fetch-registry: false # The server maintains its registry locally
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
-server:
-  port: 8761
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
@@ -26,5 +33,9 @@ management:
       probability: 1.0
 
 logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
   pattern:
-    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'

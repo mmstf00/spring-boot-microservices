@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Table(name = "t_order")
+@Table(name = "t_orders")
 @Entity
 @Getter
 @Setter

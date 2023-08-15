@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.9</version>
+        <version>3.0.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <modelVersion>4.0.0</modelVersion>
     <groupId>com.project</groupId>
     <artifactId>microservices-project</artifactId>
     <packaging>pom</packaging>
@@ -26,7 +26,6 @@
     </modules>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
@@ -43,6 +42,17 @@
         </dependencies>
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>netflix-candidates</id>
+            <name>Netflix Candidates</name>
+            <url>https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
@@ -57,12 +67,19 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!-- JIB is tool for automatically uploading images to docker hub
+            without need of Dockerfile, it uses the generated jar file-->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.2.1</version>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <from>
+                        <image>eclipse-temurin:17.0.4.1_1-jre</image>
+                    </from>
+                    <to>
+                        <image>registry.hub.docker.com/mustafa1592/${project.artifactId}</image>
+                    </to>
                 </configuration>
             </plugin>
         </plugins>

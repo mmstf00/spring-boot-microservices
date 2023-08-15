@@ -1,6 +1,8 @@
 spring:
   application:
     name: api-gateway
+  banner:
+    location: classpath:banner.txt
   cloud:
     gateway:
       routes[0]:
@@ -12,17 +14,13 @@ spring:
         uri: lb://order-service
         predicates[0]: Path=/api/order
       routes[2]:
-        id: inventory-service
-        uri: lb://inventory-service
-        predicates[0]: Path=/api/inventory
-      routes[3]:
         id: discovery-server
-        uri: http://localhost:8761
-        predicates[0]: Path=/eureka/web
+        uri: http://eureka:password@${app.eureka-server}:8761
         filters[0]: SetPath=/
-      routes[4]:
+        predicates[0]: Path=/eureka/web
+      routes[3]:
         id: discovery-server-static
-        uri: http://localhost:8761
+        uri: http://eureka:password@${app.eureka-server}:8761
         predicates[0]: Path=/eureka/**
   security:
     oauth2:
@@ -30,25 +28,31 @@ spring:
         jwt:
           # Spring Boot will read the openid configuration and will fetch
           # all the endpoints to make an authorization
-          issuer-uri: http://localhost:8181/realms/spring-boot-microservices-realm
+          issuer-uri: http://localhost:8080/realms/spring-boot-microservices-realm
+
+server:
+  port: 8181
 
 # Eureka client config
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka:password@localhost:8761/eureka
+
+app:
+  eureka-server: localhost
 
 # Increase the logging level
 logging:
-  level:
-    root: INFO
-    org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
-    org.springframework.cloud.gateway: TRACE
   pattern:
-    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
 
-# Zipkin Properties
+# Actuator Properties
 management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans

@@ -1,35 +1,32 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/inventory-service
-    username: postgres
-    password: 1234
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-      jakarta:
-        persistence:
-          sharedCache:
-            mode: UNSPECIFIED
-    open-in-view: off
   application:
     name: inventory-service
+  banner:
+    location: classpath:banner.txt
+  datasource:
+    url: jdbc:postgresql://localhost:5434/inventory-service
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+
 server:
-  port: 0 #It will run the application with random port
+  port: 0 # It will run the application with random port
 
 # Eureka client config
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka:password@localhost:8761/eureka
 
-# Zipkin Properties
+# Actuator Properties
 management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
@@ -39,4 +36,4 @@ management:
 
 logging:
   pattern:
-    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'

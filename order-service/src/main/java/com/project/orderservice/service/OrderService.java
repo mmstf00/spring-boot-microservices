@@ -8,8 +8,10 @@ import com.project.orderservice.entity.OrderLineItems;
 import com.project.orderservice.event.OrderPlacedEvent;
 import com.project.orderservice.exception.ProductNotInStockException;
 import com.project.orderservice.repository.OrderRepository;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,7 +27,8 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
-    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+    private final ObservationRegistry observationRegistry;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public String placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
@@ -38,19 +41,24 @@ public class OrderService {
 
         order.setOrderLineItemsList(orderLineItems);
 
-        // Collect all skuCodes
         List<String> skuCodes = order.getOrderLineItemsList().stream()
                 .map(OrderLineItems::getSkuCode)
                 .toList();
 
-        if (isInStock(skuCodes)) {
-            orderRepository.save(order);
-            // Producing the Message
-            kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
-            return "Successfully placed order!";
-        } else {
-            throw new ProductNotInStockException("Product is not in stock, try again later");
-        }
+        // Call Inventory Service, and place order if product is in stock
+        Observation inventoryServiceObservation = Observation.createNotStarted("inventory-service-lookup",
+                this.observationRegistry);
+        inventoryServiceObservation.lowCardinalityKeyValue("call", "inventory-service");
+        return inventoryServiceObservation.observe(() -> {
+            if (isInStock(skuCodes)) {
+                orderRepository.save(order);
+                // publish Order Placed Event
+                applicationEventPublisher.publishEvent(new OrderPlacedEvent(this, order.getOrderNumber()));
+                return "Order Placed";
+            } else {
+                throw new ProductNotInStockException("Product is not in stock, please try again later");
+            }
+        });
     }
 
     private boolean isInStock(List<String> skuCodes) {
