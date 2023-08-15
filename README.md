@@ -49,6 +49,13 @@ docker compose up -d
         - Click `Get New Access Token` and `Use Token`
         - Send the Request
 
+### Grafana dashboard setup
+
+1. Open http://localhost:3000
+2. On the left side hover on `+` icon and click Import
+3. Paste the content of `Grafana_Dashboard.json` located in the root of the project and click `Load`
+4. Select Prometheus as a datasource and click `Import`
+
 ## Available endpoints
 
 |     Name      |        Address        |
