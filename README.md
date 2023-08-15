@@ -32,8 +32,10 @@ docker compose up -d
 3. Open `Realm Settings`
     - Click `OpenID Endpoint Configuration`
     - Copy `issuer` value: `http://localhost:8080/realms/spring-boot-microservices-realm`
-    - Change in the URL `localhost` to `keycloak`, so API gateway do not try to call localhost for issuer URI.
-    - Add `	127.0.0.1		keycloak` in `C:\Windows\System32\drivers\etc\hosts.file` under this line `#	::1` to contact docker container from the host machine
+    - Change in the URL `localhost` to `keycloak`, so API gateway do not try to call localhost for
+      issuer URI.
+    - Add `    127.0.0.1		keycloak` in `C:\Windows\System32\drivers\etc\hosts.file` under this
+      line `#    ::1` to contact docker container from the host machine
 
 ### Execute HTTP requests with Postman
 
@@ -53,10 +55,12 @@ docker compose up -d
 
 |     Name      |        Address        |
 |:-------------:|:---------------------:|
-| API Endpoint  | http://localhost:8181 |
+| API Endpoint  | http://localhost:8585 |
 | Eureka Server | http://localhost:8761 |
 |   Keycloak    | http://localhost:8080 |
 |    Zipkin     | http://localhost:9411 |
+|  Prometheus   | http://localhost:9090 |
+|    Grafana    | http://localhost:3000 |
 
 ## Notes
 
