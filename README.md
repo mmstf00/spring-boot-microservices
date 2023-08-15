@@ -29,13 +29,10 @@ docker compose up -d
     - Open `spring-cloud-client`
     - Go to `Credentials` tab and click Regenerate Secret
 
-3. Open `Realm Settings`
-    - Click `OpenID Endpoint Configuration`
-    - Copy `issuer` value: `http://localhost:8080/realms/spring-boot-microservices-realm`
-    - Change in the URL `localhost` to `keycloak`, so API gateway do not try to call localhost for
-      issuer URI.
-    - Add `    127.0.0.1		keycloak` in `C:\Windows\System32\drivers\etc\hosts.file` under this
-      line `#    ::1` to contact docker container from the host machine
+### Additional Local setup to execute requests via Api Gateway
+
+- Add `    127.0.0.1		keycloak` in `C:\Windows\System32\drivers\etc\hosts.file` under this
+  line `#    ::1` to contact docker container from the host machine
 
 ### Execute HTTP requests with Postman
 
@@ -45,7 +42,8 @@ docker compose up -d
     - Configure New Token
         - Token Name: `token`
         - Grant Type: `Client Credentials`
-        - Access Token URL: The `token_endpoint` value from OpenId Configuration
+        - Access Token URL: The `token_endpoint` value from OpenId Configuration,
+          replace `localhost` with `keycloak`
         - Client ID: `spring-cloud-client`
         - Client Secret: Get from 3rd of Keycloak setup.
         - Click `Get New Access Token` and `Use Token`
